@@ -43,9 +43,12 @@ def generate_and_save_images(args):
 
 def check_size(value):
     """Custom argument type to """
-    match = re.match(r'\d+|\d+x\d+', value)
+    match = re.match(r'(\d+x\d+)|(\d+)', value)
     if match:
-        return match.group(0)
+        if match.group(2):
+            return '{}x{}'.format(match.group(2), match.group(2))
+        else:
+            return match.group(1)
     else:
         raise argparse.ArgumentTypeError(
             'Size must be a single number or match "<width>x<heigth>"'
