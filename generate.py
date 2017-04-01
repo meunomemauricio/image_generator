@@ -2,7 +2,12 @@
 
 import argparse
 import colorsys
+import os
 import re
+
+import sys
+
+DEFAULT_PREFIX = 'image_{}'
 
 
 def generate_bg_values(number):
@@ -30,12 +35,18 @@ def print_header(args, bg_values):
 
 def generate_and_save_images(args):
     bg_values = generate_bg_values(args.number)
-
     print_header(args, bg_values)
-
     if args.dry_run:
         print 'Dry Run...'
         return
+
+    padding = (args.number / 10) + 1
+    for num in range(args.number):
+        padded_num = str(num+1).zfill(padding)
+        filename = 'image_{}.{}'.format(padded_num, args.format)
+        filepath = os.path.join(args.destination, filename)
+        with open(filepath, 'wb') as file:
+            file.write('placeholder')
 
 
 def check_size(value):
@@ -52,7 +63,7 @@ def check_size(value):
         )
 
 
-def parse_args():
+def parse_args(args):
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', '--number', default=12, type=int,
                         help='Number of images to generate. Default: 12')
@@ -61,18 +72,20 @@ def parse_args():
                               'Can also be a single number, in which case the '
                               ' generated images will be a square. Default: '
                               '1024x768.'))
-    parser.add_argument('-f', '--format', default='jpeg',
-                        choices=('jpeg', 'gif', 'png'),
-                        help='Image file format. Default: jpeg')
+    parser.add_argument('-f', '--format', default='jpg',
+                        choices=('jpg', 'gif', 'png'),
+                        help='Image file format. Default: jpg')
     parser.add_argument('-d', '--dry-run', default=False, action='store_true',
                         help=('Only print debug info about the images about '
                               'to be generated.'))
+    parser.add_argument('destination',
+                        help='Directory in which to save image files.')
 
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 def main():
-    args = parse_args()
+    args = parse_args(sys.argv[1:])
     generate_and_save_images(args)
 
 
