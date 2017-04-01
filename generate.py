@@ -4,8 +4,6 @@ import argparse
 import colorsys
 import re
 
-API_URL = 'https://dummyimage.com/{size}/{bg}/{fg}.{fmt}?text={txt}'
-
 
 def generate_bg_values(number):
     """Generate Background /Hexadecimal Color Values.
@@ -25,13 +23,12 @@ def print_header(args, bg_values):
     print 'Format: {}'.format(args.format)
     print 'Size: {}'.format(args.size)
     print 'Image Background Colors: '
-    for n in range(args.number):
-        print ' - {}: {}'.format(n+1, bg_values[n])
+    for num in range(args.number):
+        print ' - {}: {}'.format(num+1, bg_values[num])
     print 80 * '='
 
 
 def generate_and_save_images(args):
-    fg = 'FFFFFF'
     bg_values = generate_bg_values(args.number)
 
     print_header(args, bg_values)
@@ -77,6 +74,7 @@ def parse_args():
 def main():
     args = parse_args()
     generate_and_save_images(args)
+
 
 if __name__ == '__main__':
     main()
