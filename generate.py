@@ -14,7 +14,7 @@ def generate_bg_values(number):
     uniformly.
     """
     colors = []
-    for i in range(number+1):
+    for i in range(number):
         colors.append(colorsys.hsv_to_rgb(float(i)/float(number), 1, 1))
 
     return ['%0.2x%0.2x%0.2x' % (x[0]*255, x[1]*255, x[2]*255) for x in colors]
