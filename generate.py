@@ -7,7 +7,7 @@ import re
 
 import sys
 
-DEFAULT_PREFIX = 'image_{}'
+DEFAULT_PREFIX = 'image_'
 
 
 def generate_bg_values(number):
@@ -43,7 +43,7 @@ def generate_and_save_images(args):
     padding = (args.number / 10) + 1
     for num in range(args.number):
         padded_num = str(num+1).zfill(padding)
-        filename = 'image_{}.{}'.format(padded_num, args.format)
+        filename = '{}{}.{}'.format(args.prefix, padded_num, args.format)
         filepath = os.path.join(args.destination, filename)
         with open(filepath, 'wb') as file:
             file.write('placeholder')
@@ -78,6 +78,8 @@ def parse_args(args):
     parser.add_argument('-d', '--dry-run', default=False, action='store_true',
                         help=('Only print debug info about the images about '
                               'to be generated.'))
+    parser.add_argument('-p', '--prefix', default=DEFAULT_PREFIX,
+                        help='Images filename prefix. Default: "image_".')
     parser.add_argument('destination',
                         help='Directory in which to save image files.')
 

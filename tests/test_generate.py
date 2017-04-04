@@ -115,3 +115,11 @@ class GenerateAndSaveImages(unittest.TestCase):
         self.assertEqual(len(files), 10)
         for filename in filenames:
             self.assertIn(filename, files)
+
+    def test_different_filename_prefix(self):
+        """The user should be able to specify a different filename prefix."""
+        args = parse_args(['-p', 'prefix_', '-n', '1', self.destination])
+
+        generate_and_save_images(args)
+
+        self.assertIn('prefix_1.jpg', os.listdir(self.destination))
