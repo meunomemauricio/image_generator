@@ -73,7 +73,7 @@ def parse_args(args):
                               ' generated images will be a square. Default: '
                               '1024x768.'))
     parser.add_argument('-f', '--format', default='jpg',
-                        choices=('jpg', 'gif', 'png'),
+                        choices=('jpg', 'gif', 'png', 'bmp'),
                         help='Image file format. Default: jpg')
     parser.add_argument('-d', '--dry-run', default=False, action='store_true',
                         help=('Only print debug info about the images about '

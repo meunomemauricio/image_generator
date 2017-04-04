@@ -60,9 +60,20 @@ class GenerateAndSaveImages(unittest.TestCase):
         self.assertIn(expected_filename, files)
 
     def test_generate_gif_image(self):
-        """Filename should have PNG extention."""
-        args = parse_args(['-f', 'png', '-n', '1', self.destination])
-        expected_filename = 'image_1.png'
+        """Filename should have GIF extention."""
+        args = parse_args(['-f', 'gif', '-n', '1', self.destination])
+        expected_filename = 'image_1.gif'
+
+        generate_and_save_images(args)
+
+        files = os.listdir(self.destination)
+        self.assertEqual(len(files), 1)
+        self.assertIn(expected_filename, files)
+
+    def test_generate_bmp_image(self):
+        """Filename should have BMP extention."""
+        args = parse_args(['-f', 'bmp', '-n', '1', self.destination])
+        expected_filename = 'image_1.bmp'
 
         generate_and_save_images(args)
 
