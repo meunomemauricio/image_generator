@@ -1,6 +1,6 @@
 # Image Generator
 
-Tool to generate diverse images for testing purposes.
+Simple placeholder image generator.
 
 ## Running Tests
 

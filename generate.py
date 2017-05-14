@@ -4,23 +4,27 @@ import argparse
 import colorsys
 import os
 import re
-
 import sys
 
+from image_generator import generate_text_image
+
 DEFAULT_PREFIX = 'image_'
+
+WHITE = 'FFFFFF'
 
 
 def generate_bg_values(number):
     """Generate Background /Hexadecimal Color Values.
 
-    Returns a list of RGB hexadecimal color codes by distributing the Hue range
-    uniformly.
+    Returns a list of RGB color codes by distributing the Hue range uniformly.
     """
     colors = []
     for i in range(number):
-        colors.append(colorsys.hsv_to_rgb(float(i)/float(number), 1, 1))
+        hue = float(i)/float(number)
+        normalized = colorsys.hsv_to_rgb(hue, 1, 1)
+        colors.append(tuple(int(x* 255) for x in normalized))
 
-    return ['%0.2x%0.2x%0.2x' % (x[0]*255, x[1]*255, x[2]*255) for x in colors]
+    return colors
 
 
 def print_header(args, bg_values):
@@ -42,21 +46,25 @@ def generate_and_save_images(args):
 
     padding = (args.number / 10) + 1
     for num in range(args.number):
+        content = generate_text_image(
+            args.format, WHITE, bg_values[num], args.size, num + 1)
+
         padded_num = str(num+1).zfill(padding)
         filename = '{}{}.{}'.format(args.prefix, padded_num, args.format)
         filepath = os.path.join(args.destination, filename)
         with open(filepath, 'wb') as file:
-            file.write('placeholder')
+            file.write(content)
 
 
 def check_size(value):
-    """Custom argument type to """
-    match = re.match(r'(\d+x\d+)|(\d+)', value)
+    """Custom argument type to convert string to size tuple."""
+    match = re.match(r'(\d+)x(\d+)|(\d+)', value)
     if match:
-        if match.group(2):
-            return '{}x{}'.format(match.group(2), match.group(2))
+        if match.group(3):
+            dimension = int(match.group(3))
+            return (dimension, dimension)
         else:
-            return match.group(1)
+            return (int(match.group(1)), int(match.group(2)))
     else:
         raise argparse.ArgumentTypeError(
             'Size must be a single number or match "<width>x<heigth>"'

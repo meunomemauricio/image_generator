@@ -3,8 +3,10 @@ import os
 import tempfile
 import unittest
 
-from generate import check_size, generate_bg_values, generate_and_save_images, \
-    parse_args
+from mock import mock
+
+from generate import (check_size, generate_and_save_images, generate_bg_values,
+                      parse_args)
 
 
 class CheckSizeTests(unittest.TestCase):
@@ -16,23 +18,27 @@ class CheckSizeTests(unittest.TestCase):
     def test_single_number_size(self):
         size = check_size('100')
 
-        self.assertEquals(size, '100x100')
+        self.assertEquals(size, (100, 100))
 
     def test_full_size(self):
         size = check_size('100x200')
 
-        self.assertEquals(size, '100x200')
+        self.assertEquals(size, (100, 200))
 
 
 class GenerateBGValuesTests(unittest.TestCase):
 
-    def test_generated_bg_Values(self):
-        number = 3
+    def test_generated_bg_values(self):
+        """Should return RGB color codes in tuples."""
+        expected_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
 
         values = generate_bg_values(3)
 
-        self.assertEqual(len(values), number)
-        self.assertEqual(values, ['ff0000', '00ff00', '0000ff'])
+        self.assertEqual(values, expected_colors)
+        for r, g, b in values:
+            self.assertIsInstance(r, int)
+            self.assertIsInstance(g, int)
+            self.assertIsInstance(b, int)
 
 
 class GenerateAndSaveImages(unittest.TestCase):
@@ -40,7 +46,8 @@ class GenerateAndSaveImages(unittest.TestCase):
     def setUp(self):
         self.destination = tempfile.mkdtemp()
 
-    def test_dry_run(self):
+    @mock.patch('generate.generate_text_image', return_value='content')
+    def test_dry_run(self, gen_mk):
         """Should not generate any file."""
         args = parse_args(['-d', self.destination])
 
@@ -48,7 +55,8 @@ class GenerateAndSaveImages(unittest.TestCase):
 
         self.assertFalse(os.listdir(self.destination))
 
-    def test_generate_png_image(self):
+    @mock.patch('generate.generate_text_image', return_value='content')
+    def test_generate_png_image(self, gen_mk):
         """Filename should have PNG extention."""
         args = parse_args(['-f', 'png', '-n', '1', self.destination])
         expected_filename = 'image_1.png'
@@ -59,7 +67,8 @@ class GenerateAndSaveImages(unittest.TestCase):
         self.assertEqual(len(files), 1)
         self.assertIn(expected_filename, files)
 
-    def test_generate_gif_image(self):
+    @mock.patch('generate.generate_text_image', return_value='content')
+    def test_generate_gif_image(self, gen_mk):
         """Filename should have GIF extention."""
         args = parse_args(['-f', 'gif', '-n', '1', self.destination])
         expected_filename = 'image_1.gif'
@@ -70,7 +79,8 @@ class GenerateAndSaveImages(unittest.TestCase):
         self.assertEqual(len(files), 1)
         self.assertIn(expected_filename, files)
 
-    def test_generate_bmp_image(self):
+    @mock.patch('generate.generate_text_image', return_value='content')
+    def test_generate_bmp_image(self, gen_mk):
         """Filename should have BMP extention."""
         args = parse_args(['-f', 'bmp', '-n', '1', self.destination])
         expected_filename = 'image_1.bmp'
@@ -81,7 +91,8 @@ class GenerateAndSaveImages(unittest.TestCase):
         self.assertEqual(len(files), 1)
         self.assertIn(expected_filename, files)
 
-    def test_generate_one_image(self):
+    @mock.patch('generate.generate_text_image', return_value='content')
+    def test_generate_one_image(self, gen_mk):
         """Should successfully generate a file."""
         args = parse_args(['-n', '1', self.destination])
         expected_filename = 'image_1.jpg'
@@ -92,7 +103,8 @@ class GenerateAndSaveImages(unittest.TestCase):
         self.assertEqual(len(files), 1)
         self.assertIn(expected_filename, files)
 
-    def test_generate_three_images(self):
+    @mock.patch('generate.generate_text_image', return_value='content')
+    def test_generate_three_images(self, gen_mk):
         """Should successfully generate three files."""
         args = parse_args(['-n', '3', self.destination])
         filenames  = ['image_{}.jpg'.format(x) for x in range(1, 3+1)]
@@ -104,7 +116,8 @@ class GenerateAndSaveImages(unittest.TestCase):
         for filename in filenames:
             self.assertIn(filename, files)
 
-    def test_generate_ten_images(self):
+    @mock.patch('generate.generate_text_image', return_value='content')
+    def test_generate_ten_images(self, gen_mk):
         """Numbers in filenames should be propperly padded."""
         args = parse_args(['-n', '10', self.destination])
         filenames  = ['image_{:02d}.jpg'.format(x) for x in range(1, 10+1)]
@@ -116,7 +129,8 @@ class GenerateAndSaveImages(unittest.TestCase):
         for filename in filenames:
             self.assertIn(filename, files)
 
-    def test_different_filename_prefix(self):
+    @mock.patch('generate.generate_text_image', return_value='content')
+    def test_different_filename_prefix(self, gen_mk):
         """The user should be able to specify a different filename prefix."""
         args = parse_args(['-p', 'prefix_', '-n', '1', self.destination])
 
